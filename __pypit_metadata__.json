@@ -1,0 +1,17 @@
+{
+  "name": "singletonify",
+  "version": "0.1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "cologler",
+  "author_email": "skyoflw@gmail.com",
+  "url": "https://github.com/Cologler/singletonify-python",
+  "license": "MIT License",
+  "classifiers": [],
+  "entry_points": {},
+  "zip_safe": false,
+  "include_package_data": true,
+  "setup_requires": [],
+  "install_requires": [],
+  "tests_require": []
+}
