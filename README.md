@@ -1,0 +1,1 @@
+# singletonify-python
