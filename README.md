@@ -1,5 +1,11 @@
 # singletonify
 
+## install
+
+``` cmd
+pip install singletonify
+```
+
 ## usage
 
 ``` py
