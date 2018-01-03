@@ -1,8 +1,10 @@
 {
   "name": "singletonify",
-  "version": "0.1.0.0",
+  "version": "0.1.0.1",
   "description": "",
-  "keywords": [],
+  "keywords": [
+    "singleton"
+  ],
   "author": "cologler",
   "author_email": "skyoflw@gmail.com",
   "url": "https://github.com/Cologler/singletonify-python",
