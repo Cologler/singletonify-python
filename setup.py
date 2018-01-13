@@ -22,7 +22,7 @@ setup(
     packages = find_packages(),
     # auto generated:
     name = 'singletonify',
-    version = '0.1.0.1',
+    version = '0.1.1.0',
     description = '',
     keywords = ['singleton'],
     author = 'cologler',
@@ -30,6 +30,7 @@ setup(
     url = 'https://github.com/Cologler/singletonify-python',
     license = 'MIT License',
     classifiers = [],
+    scripts = [],
     entry_points = {},
     zip_safe = False,
     include_package_data = True,
