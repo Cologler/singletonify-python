@@ -15,10 +15,11 @@ class _EmptyLock:
         pass
 _NULL_LOCK = _EmptyLock()
 
+GLOBAL_LOCK = _NULL_LOCK
 
-def singleton(*args, namespace={}, concurrent=False):
+def singleton(*args, namespace={}):
 
-    lock = _NULL_LOCK if not concurrent else threading.RLock()
+    lock = GLOBAL_LOCK
 
     def new_singleton_metaclass(_type):
         class Singleton(_type):
