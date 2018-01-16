@@ -6,40 +6,44 @@
 #
 # ----------
 
+from abc import abstractmethod
 import threading
 
-class _EmptyLock:
-    def __enter__(self):
+class _SingletonBase:
+    __slots__ = ()
+
+    @abstractmethod
+    def new(self, *args, **kwargs):
         pass
-    def __exit__(self, *args, **kwargs):
-        pass
-_NULL_LOCK = _EmptyLock()
 
-GLOBAL_LOCK = _NULL_LOCK
 
-def singleton(*args, namespace={}):
+def singleton(*args):
 
-    lock = GLOBAL_LOCK
+    lock = threading.RLock()
+    instance = lock
 
     def new_singleton_metaclass(_type):
-        class Singleton(_type):
+        class Singleton(_type, _SingletonBase):
             __slots__ = ()
 
             def __call__(self, *args, **kwargs):
-                with lock:
-                    if self not in namespace:
-                        namespace[self] = super().__call__(*args, **kwargs)
-                    return namespace[self]
+                nonlocal instance
+                if instance is lock:
+                    with lock:
+                        if instance is lock:
+                            if issubclass(_type, _SingletonBase):
+                                instance = _type.new(self, *args, **kwargs)
+                            else:
+                                instance = self.new(*args, **kwargs)
+                return instance
+
+            def new(self, *args, **kwargs):
+                return super().__call__(*args, **kwargs)
+
         return Singleton
 
     def _wrap(cls):
-        with lock:
-            metaclass = namespace.get(0)
-            if metaclass is None:
-                namespace[0] = metaclass = new_singleton_metaclass(type)
-
-        if type(cls) not in (type, metaclass):
-            metaclass = new_singleton_metaclass(type(cls))
+        metaclass = new_singleton_metaclass(type(cls))
 
         # pylint: disable=E1139
         class WrapedClass(cls, metaclass=metaclass):
@@ -49,9 +53,6 @@ def singleton(*args, namespace={}):
             setattr(WrapedClass, attr, getattr(cls, attr))
 
         return WrapedClass
-
-    _wrap.clear_cache = namespace.clear
-    _wrap.get = namespace.get
 
     if args:
         cls, = args

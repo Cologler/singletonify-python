@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
         self.assertIs(Class2(), Class2())
         self.assertIsNot(Class1(), Class2())
 
-    def test_slots(self):
+    def test_with_slots(self):
         @singleton
         class SingletonClassWithDict:
             pass
@@ -41,14 +41,27 @@ class Test(unittest.TestCase):
     def test_inherit(self):
         @singleton
         class Class1:
-            pass
+            def __init__(self):
+                self.a = 1
 
         @singleton
         class Class2(Class1):
-            pass
+            def __init__(self):
+                super().__init__()
+                self.a = 2
+                self.b = 'b'
 
+        self.assertIs(Class1(), Class1())
+        self.assertIs(Class2(), Class2())
         self.assertIsNot(Class1(), Class2())
+        self.assertIsInstance(Class1(), Class1)
         self.assertIsInstance(Class2(), Class1)
+        self.assertIsInstance(Class2(), Class2)
+        self.assertNotIsInstance(Class1(), Class2)
+
+        self.assertEqual(Class1().a, 1)
+        self.assertEqual(Class2().a, 2)
+        self.assertEqual(Class2().b, 'b')
 
 
 def main(argv=None):
