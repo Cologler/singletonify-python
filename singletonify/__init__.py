@@ -18,7 +18,7 @@ class _SingletonBase:
         pass
 
 
-def singleton(*args):
+def singleton(cls):
 
     lock = threading.RLock()
     instance = lock
@@ -43,19 +43,12 @@ def singleton(*args):
 
         return Singleton
 
-    def _wrap(cls):
-        metaclass = new_singleton_metaclass(type(cls))
+    metaclass = new_singleton_metaclass(type(cls))
 
-        # pylint: disable=E1139
-        class WrapedClass(cls, metaclass=metaclass):
-            __slots__ = ()
+    # pylint: disable=E1139
+    class WrapedClass(cls, metaclass=metaclass):
+        __slots__ = ()
 
-        update_wrapper(WrapedClass, cls, updated=())
+    update_wrapper(WrapedClass, cls, updated=())
 
-        return WrapedClass
-
-    if args:
-        cls, = args
-        return _wrap(cls)
-    else:
-        return _wrap
+    return WrapedClass
