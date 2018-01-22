@@ -7,6 +7,7 @@
 # ----------
 
 from abc import abstractmethod
+from functools import update_wrapper
 import threading
 
 class _SingletonBase:
@@ -49,8 +50,7 @@ def singleton(*args):
         class WrapedClass(cls, metaclass=metaclass):
             __slots__ = ()
 
-        for attr in ('__module__', '__name__', '__qualname__', '__doc__'):
-            setattr(WrapedClass, attr, getattr(cls, attr))
+        update_wrapper(WrapedClass, cls, updated=())
 
         return WrapedClass
 
