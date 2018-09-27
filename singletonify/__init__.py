@@ -7,48 +7,56 @@
 # ----------
 
 from abc import abstractmethod
+from typing import Callable
 from functools import update_wrapper
 import threading
 
 class _SingletonBase:
     __slots__ = ()
 
-    @abstractmethod
-    def new(self, *args, **kwargs):
-        pass
+
+class _Box:
+    __slots__ = ('value')
+    def __init__(self):
+        self.value = None
 
 
-def singleton(cls):
+def singleton(*args, **kwargs):
+    '''
+    a lazy init singleton pattern.
 
-    lock = threading.RLock()
-    instance = lock
+    usage:
 
-    def new_singleton_metaclass(_type):
-        class Singleton(_type, _SingletonBase):
-            __slots__ = ()
+    ``` py
+    @singleton()
+    class X: ...
+    ```
 
-            def __call__(self, *args, **kwargs):
-                nonlocal instance
-                if instance is lock:
-                    with lock:
-                        if instance is lock:
-                            if issubclass(_type, _SingletonBase):
-                                instance = _type.new(self, *args, **kwargs)
-                            else:
-                                instance = self.new(*args, **kwargs)
-                return instance
+    `args` and `kwargs` will pass to ctor of `X` as args.
+    '''
 
-            def new(self, *args, **kwargs):
-                return super().__call__(*args, **kwargs)
+    def decorator(cls: type) -> Callable[[], object]:
+        if issubclass(cls, _SingletonBase):
+            raise TypeError('cannot inherit from another singleton class.')
 
-        return Singleton
+        box = _Box()
+        factory = None
 
-    metaclass = new_singleton_metaclass(type(cls))
+        def metaclass_call(_):
+            if box.value is None:
+                instance = cls(*args, **kwargs)
+                instance.__class__ = factory
+                box.value = (instance, ) # use tuple to handle `cls()` return `None`
+            return box.value[0]
 
-    # pylint: disable=E1139
-    class WrapedClass(cls, metaclass=metaclass):
-        __slots__ = ()
+        SingletonMetaClass = type('SingletonMetaClass', (type(cls), ), {
+            '__slots__': (),
+            '__call__': metaclass_call
+        })
 
-    update_wrapper(WrapedClass, cls, updated=())
+        factory = SingletonMetaClass(cls.__name__, (cls, _SingletonBase), {
+            '__slots__': (),
+        })
+        return update_wrapper(factory, cls, updated=())
 
-    return WrapedClass
+    return decorator
