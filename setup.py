@@ -6,13 +6,15 @@
 #
 # ----------
 
+DOC_NAME = 'README.md'
+
 import os
 from setuptools import setup, find_packages
 
 long_description = ''
 
-if os.path.isfile('__pypit_desc__.rst'):
-    with open('__pypit_desc__.rst') as fp:
+if os.path.isfile(DOC_NAME):
+    with open(DOC_NAME) as fp:
         long_description = fp.read()
 
 long_description = long_description or ''
@@ -22,7 +24,7 @@ setup(
     packages=find_packages(),
     # auto generated:
     name='singletonify',
-    version='0.1.2.0',
+    version='0.2.1',
     description='',
     keywords=['singleton'],
     author='cologler',

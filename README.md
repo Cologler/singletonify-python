@@ -9,9 +9,9 @@ pip install singletonify
 ## usage
 
 ``` py
-@singleton
+@singleton(a=3)
 class YourClass:
-    pass
+    def __init__(self, a): ...
 
 assert YourClass() is YourClass()
 ```
