@@ -51,6 +51,9 @@ def singleton(*args, **kwargs):
                     box.value = (instance, ) # use tuple to handle `cls()` return `None`
             return box.value[0]
 
+        def _is_init(*_):
+            return box.value is not None
+
         SingletonMetaClass = type('SingletonMetaClass', (type(cls), _SingletonMetaClassBase), {
             '__slots__': (),
             '__call__': metaclass_call
@@ -58,6 +61,7 @@ def singleton(*args, **kwargs):
 
         factory = SingletonMetaClass(cls.__name__, (cls, ), {
             '__slots__': (),
+            '_is_init': _is_init
         })
         return update_wrapper(factory, cls, updated=())
 

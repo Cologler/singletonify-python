@@ -15,7 +15,9 @@ def test_base():
     @singleton()
     class A:
         pass
+    assert not A._is_init()
     assert A() is A()
+    assert A._is_init()
 
 def test_with_args():
     @singleton(x='s')
