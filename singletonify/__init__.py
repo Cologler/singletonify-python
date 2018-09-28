@@ -11,7 +11,7 @@ from typing import Callable
 from functools import update_wrapper
 import threading
 
-class _SingletonBase:
+class _SingletonMetaClassBase:
     __slots__ = ()
 
 
@@ -36,7 +36,7 @@ def singleton(*args, **kwargs):
     '''
 
     def decorator(cls: type) -> Callable[[], object]:
-        if issubclass(cls, _SingletonBase):
+        if issubclass(type(cls), _SingletonMetaClassBase):
             raise TypeError('cannot inherit from another singleton class.')
 
         box = _Box()
@@ -49,12 +49,12 @@ def singleton(*args, **kwargs):
                 box.value = (instance, ) # use tuple to handle `cls()` return `None`
             return box.value[0]
 
-        SingletonMetaClass = type('SingletonMetaClass', (type(cls), ), {
+        SingletonMetaClass = type('SingletonMetaClass', (type(cls), _SingletonMetaClassBase), {
             '__slots__': (),
             '__call__': metaclass_call
         })
 
-        factory = SingletonMetaClass(cls.__name__, (cls, _SingletonBase), {
+        factory = SingletonMetaClass(cls.__name__, (cls, ), {
             '__slots__': (),
         })
         return update_wrapper(factory, cls, updated=())
