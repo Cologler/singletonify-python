@@ -1,6 +1,8 @@
 # singletonify
 
 [![Build Status](https://travis-ci.com/Cologler/singletonify-python.svg?branch=master)](https://travis-ci.com/Cologler/singletonify-python)
+[![PyPI](https://img.shields.io/pypi/v/singletonify.svg)](https://pypi.org/project/singletonify/)
+
 
 ## install
 
