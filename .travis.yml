@@ -6,3 +6,7 @@ python:
   - '3.7'
 script:
   - python -m pytest test.py
+deploy:
+  provider: pypi
+  user: $PYPI_USER
+  password: $PYPI_PW
