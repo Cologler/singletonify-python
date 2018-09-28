@@ -9,7 +9,7 @@
 from abc import abstractmethod
 from typing import Callable
 from functools import update_wrapper
-import threading
+from threading import Lock
 
 class _SingletonMetaClassBase:
     __slots__ = ()
@@ -41,12 +41,14 @@ def singleton(*args, **kwargs):
 
         box = _Box()
         factory = None
+        lock = Lock()
 
         def metaclass_call(_):
             if box.value is None:
-                instance = cls(*args, **kwargs)
-                instance.__class__ = factory
-                box.value = (instance, ) # use tuple to handle `cls()` return `None`
+                with lock:
+                    instance = cls(*args, **kwargs)
+                    instance.__class__ = factory
+                    box.value = (instance, ) # use tuple to handle `cls()` return `None`
             return box.value[0]
 
         SingletonMetaClass = type('SingletonMetaClass', (type(cls), _SingletonMetaClassBase), {
