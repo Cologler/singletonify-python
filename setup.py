@@ -24,7 +24,7 @@ setup(
     packages=find_packages(),
     # auto generated:
     name='singletonify',
-    version='0.2.2',
+    version='0.2.3',
     description='',
     keywords=['singleton'],
     author='cologler',
