@@ -46,9 +46,10 @@ def singleton(*args, **kwargs):
         def metaclass_call(_):
             if box.value is None:
                 with lock:
-                    instance = cls(*args, **kwargs)
-                    instance.__class__ = factory
-                    box.value = (instance, ) # use tuple to handle `cls()` return `None`
+                    if box.value is None:
+                        instance = cls(*args, **kwargs)
+                        instance.__class__ = factory
+                        box.value = (instance, ) # use tuple to handle `cls()` return `None`
             return box.value[0]
 
         def _is_init(*_):
