@@ -88,7 +88,7 @@ def test_inherit_from_singleton():
         pass
 
     # cannot inherit
-    with raises(TypeError):
+    with raises(TypeError, match='cannot inherit from a singleton class'):
         @singleton()
         class A(B):
             pass

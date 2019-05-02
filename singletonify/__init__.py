@@ -9,10 +9,7 @@
 from abc import abstractmethod
 from typing import Callable
 from functools import update_wrapper
-from threading import Lock
-
-class _SingletonMetaClassBase:
-    __slots__ = ()
+from threading import RLock
 
 
 class _Box:
@@ -30,39 +27,43 @@ def singleton(*args, **kwargs):
     ``` py
     @singleton()
     class X: ...
+    assert YourClass() is YourClass()
     ```
 
     `args` and `kwargs` will pass to ctor of `X` as args.
     '''
 
     def decorator(cls: type) -> Callable[[], object]:
-        if issubclass(type(cls), _SingletonMetaClassBase):
-            raise TypeError('cannot inherit from another singleton class.')
 
         box = _Box()
         factory = None
-        lock = Lock()
+        lock = RLock()
 
         def metaclass_call(_):
             if box.value is None:
                 with lock:
                     if box.value is None:
-                        instance = cls(*args, **kwargs)
-                        instance.__class__ = factory
+                        instance = cls.__new__(factory, *args, **kwargs)
+                        if isinstance(instance, factory):
+                            cls.__init__(instance, *args, **kwargs)
                         box.value = (instance, ) # use tuple to handle `cls()` return `None`
             return box.value[0]
 
         def _is_init(*_):
             return box.value is not None
 
-        SingletonMetaClass = type('SingletonMetaClass', (type(cls), _SingletonMetaClassBase), {
+        SingletonMetaClass = type('SingletonMetaClass', (type(cls), ), {
             '__slots__': (),
             '__call__': metaclass_call
         })
 
+        def __init_subclass__(cls, *args, **kwargs):
+            raise TypeError('cannot inherit from a singleton class')
+
         factory = SingletonMetaClass(cls.__name__, (cls, ), {
             '__slots__': (),
-            '_is_init': _is_init
+            '__init_subclass__': __init_subclass__,
+            '_is_init': _is_init,
         })
         return update_wrapper(factory, cls, updated=())
 
