@@ -13,6 +13,8 @@ pip install singletonify
 ## usage
 
 ``` py
+from singletonify import singleton
+
 @singleton(a=3)
 class YourClass:
     def __init__(self, a): ...
